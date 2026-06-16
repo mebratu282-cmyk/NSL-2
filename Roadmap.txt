@@ -1,0 +1,18 @@
+Sprint 1
+FastAPI setup
+Next.js setup
+Database connection
+JWT Authentication
+Sprint 2
+User Management
+Department Management
+Sprint 3
+Employee Management
+Sprint 4
+Daily Logs
+Sprint 5
+Dashboard & Reports
+Sprint 6
+Audit Trail
+Notifications
+Export to Excel/PD
