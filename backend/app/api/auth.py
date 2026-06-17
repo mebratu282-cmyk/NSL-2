@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
+from sqlalchemy import String
 from sqlalchemy.orm import Session
 from app.database.connection import get_db
 from app.models.user import User
@@ -10,6 +11,12 @@ from fastapi.security import OAuth2PasswordRequestForm
 from app.core.security import (
     verify_password,
     create_access_token
+)
+from sqlalchemy.orm import Mapped
+from sqlalchemy.orm import mapped_column
+
+password_hash: Mapped[str] = mapped_column(
+    String(255)
 )
 
 router = APIRouter(
