@@ -13,6 +13,8 @@ from app.models.approval import Approval
 from app.api.service_categories import (
     router as service_categories_router
 )
+from app.api import analytics
+
 from app.models.log_activity import (
     LogActivity
 )
@@ -75,6 +77,10 @@ app.include_router(reports_router)
 app.include_router(
     log_activities_router
 )
+app.include_router(
+analytics.router
+)
+
 app.include_router(performance_router)
 app.add_middleware(
     CORSMiddleware,

@@ -9,18 +9,16 @@ from app.database.connection import get_db
 from app.models.employee import Employee
 from app.models.department import Department
 
-from app.schemas.employee import EmployeeCreate
+from app.schemas.employee import (
+EmployeeCreate,
+EmployeeUpdate
+)
 
 from app.core.roles import require_admin
 
-from app.schemas.employee import (
-    EmployeeCreate,
-    EmployeeUpdate
-)
-
 router = APIRouter(
-    prefix="/employees",
-    tags=["Employees"]
+prefix="/employees",
+tags=["Employees"]
 )
 
 @router.post("/")
@@ -28,13 +26,15 @@ def create_employee(
     employee: EmployeeCreate,
     db: Session = Depends(get_db),
     current_user=Depends(require_admin)
-):
+    ):
+
 
     department = (
         db.query(Department)
         .filter(
             Department.department_id
-            == employee.department_id
+            ==
+            employee.department_id
         )
         .first()
     )
@@ -49,7 +49,8 @@ def create_employee(
         db.query(Employee)
         .filter(
             Employee.employee_code
-            == employee.employee_code
+            ==
+            employee.employee_code
         )
         .first()
     )
@@ -61,33 +62,53 @@ def create_employee(
         )
 
     db_employee = Employee(
-        employee_code=employee.employee_code,
-        full_name=employee.full_name,
-        phone=employee.phone,
-        email=employee.email,
-        department_id=employee.department_id
+        employee_code=
+            employee.employee_code,
+
+        full_name=
+            employee.full_name,
+
+        phone=
+            employee.phone,
+
+        email=
+            employee.email,
+
+        department_id=
+            employee.department_id
     )
 
     db.add(db_employee)
+
     db.commit()
+
     db.refresh(db_employee)
 
     return db_employee
 
+
 @router.get("/")
 def get_employees(
     db: Session = Depends(get_db)
-):
+    ):
     return db.query(Employee).all()
 
 @router.get("/{employee_id}")
 def get_employee(
     employee_id: int,
     db: Session = Depends(get_db)
-):
-    employee = db.query(Employee).filter(
-        Employee.employee_id == employee_id
-    ).first()
+    ):
+
+
+    employee = (
+        db.query(Employee)
+        .filter(
+            Employee.employee_id
+            ==
+            employee_id
+        )
+        .first()
+    )
 
     if not employee:
         raise HTTPException(
@@ -97,15 +118,25 @@ def get_employee(
 
     return employee
 
+
 @router.put("/{employee_id}")
 def update_employee(
     employee_id: int,
     employee_data: EmployeeUpdate,
-    db: Session = Depends(get_db)
-):
-    employee = db.query(Employee).filter(
-        Employee.employee_id == employee_id
-    ).first()
+    db: Session = Depends(get_db),
+    current_user=Depends(require_admin)
+    ):
+
+
+    employee = (
+        db.query(Employee)
+        .filter(
+            Employee.employee_id
+            ==
+            employee_id
+        )
+        .first()
+    )
 
     if not employee:
         raise HTTPException(
@@ -113,41 +144,61 @@ def update_employee(
             detail="Employee not found"
         )
 
-    employee.employee_code = (
+    setattr(
+        employee,
+        "employee_code",
         employee_data.employee_code
     )
 
-    employee.full_name = (
+    setattr(
+        employee,
+        "full_name",
         employee_data.full_name
     )
 
-    employee.phone = (
+    setattr(
+        employee,
+        "phone",
         employee_data.phone
     )
 
-    employee.email = (
+    setattr(
+        employee,
+        "email",
         employee_data.email
     )
 
-    employee.department_id = (
+    setattr(
+        employee,
+        "department_id",
         employee_data.department_id
     )
-
     db.commit()
+
     db.refresh(employee)
 
     return {
-        "message": "Employee updated"
+        "message":
+        "Employee updated"
     }
+
 
 @router.delete("/{employee_id}")
 def delete_employee(
     employee_id: int,
-    db: Session = Depends(get_db)
-):
-    employee = db.query(Employee).filter(
-        Employee.employee_id == employee_id
-    ).first()
+    db: Session = Depends(get_db),
+    current_user=Depends(require_admin)
+    ):
+
+    employee = (
+        db.query(Employee)
+        .filter(
+            Employee.employee_id
+            ==
+            employee_id
+        )
+        .first()
+    )
 
     if not employee:
         raise HTTPException(
@@ -156,8 +207,11 @@ def delete_employee(
         )
 
     db.delete(employee)
+
     db.commit()
 
     return {
-        "message": "Employee deleted"
+        "message":
+        "Employee deleted"
     }
+

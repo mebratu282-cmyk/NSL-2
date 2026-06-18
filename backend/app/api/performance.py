@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
@@ -73,7 +75,7 @@ def calculate_performance(
 
         quality_percent=
             float(
-                log_activity.quality_percent
+                log_activity.quality_percent  # type: ignore[arg-type]
             ),
 
         standard_quantity=
