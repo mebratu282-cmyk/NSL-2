@@ -9,6 +9,10 @@ from app.schemas.approval import ApprovalRequest
 from app.core.roles import require_admin
 from app.models.user import User
 
+from app.models.service import Service
+from app.schemas.supervisor import (
+    PendingLogResponse
+)
 
 
 router = APIRouter(
@@ -66,7 +70,7 @@ def approve_log(
             detail="Log not found"
         )
 
-    log.status = "APPROVED"
+        log.status = "APPROVED"
 
     log.approved_by = current_user.user_id
 
@@ -100,7 +104,7 @@ def reject_log(
             detail="Log not found"
         )
 
-    log.status = "REJECTED"
+        log.status = "REJECTED"
 
     log.approved_by = current_user.user_id
 
@@ -132,7 +136,7 @@ def submit_log(
             detail="Log not found"
         )
 
-    log.status = "SUBMITTED"
+        log.status = "SUBMITTED"
 
     db.commit()
 
@@ -164,3 +168,43 @@ def get_pending_logs(
     )
 
     return logs
+
+@router.get(
+    "/pending-details/{supervisor_id}",
+    response_model=list[PendingLogResponse]
+)
+def get_pending_logs_details(
+    supervisor_id: int,
+    db: Session = Depends(get_db)
+):
+    logs = (
+        db.query(
+            DailyLog.log_id,
+            User.full_name.label(
+                "employee_name"
+            ),
+            Service.service_name.label(
+                "service_name"
+            ),
+            DailyLog.log_date,
+            DailyLog.status
+        )
+        .join(
+            User,
+            DailyLog.user_id ==
+            User.user_id
+        )
+        .join(
+            Service,
+            DailyLog.service_id ==
+            Service.service_id
+        )
+        .filter(
+            DailyLog.status ==
+            "SUBMITTED"
+        )
+        .all()
+    )
+
+    return logs
+

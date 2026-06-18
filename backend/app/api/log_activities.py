@@ -23,6 +23,14 @@ from app.models.performance_result import (
 from app.services.performance_calculator import (
     calculate_scores
 )
+from app.models.performance_result import (
+PerformanceResult
+)
+
+from app.schemas.log_details import (
+LogDetailResponse
+)
+
 
 router = APIRouter(
     prefix="/log-activities",
@@ -127,3 +135,38 @@ def get_log_activity_by_log(
         )
         .all()
     )
+    
+@router.get(
+"/details/{log_id}",
+response_model=list[LogDetailResponse]
+)
+def get_log_details(
+log_id: int,
+db: Session = Depends(get_db)
+):
+
+    results = (
+        db.query(
+            ActivityTemplate.activity_name,
+            LogActivity.quantity_completed,
+            LogActivity.duration_minutes,
+            LogActivity.quality_percent,
+            PerformanceResult.final_score
+        )
+        .join(
+            ActivityTemplate,
+            LogActivity.activity_id ==
+            ActivityTemplate.activity_id
+        )
+        .join(
+            PerformanceResult,
+            LogActivity.log_activity_id ==
+            PerformanceResult.log_activity_id
+        )
+        .filter(
+            LogActivity.log_id == log_id
+        )
+        .all()
+    )
+
+    return results
