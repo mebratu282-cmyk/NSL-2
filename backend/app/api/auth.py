@@ -12,12 +12,7 @@ from app.core.security import (
     verify_password,
     create_access_token
 )
-from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import mapped_column
 
-password_hash: Mapped[str] = mapped_column(
-    String(255)
-)
 
 router = APIRouter(
     prefix="/auth",
@@ -38,17 +33,35 @@ def login(
         )
         .first()
     )
+    print("Username:", form_data.username)
 
+    print(
+        "Password entered:",
+        form_data.password
+    )
+
+    print(
+        "Hash:",
+        user.password_hash
+    )
     if not user:
         raise HTTPException(
             status_code=401,
             detail="Invalid username or password"
         )
 
-    if not verify_password(
+    print("Username:", form_data.username)
+    print("Password entered:", form_data.password)
+    print("Hash:", user.password_hash)
+
+    result = verify_password(
         form_data.password,
-        user.password_hash
-    ):
+        str(user.password_hash)
+    )
+
+    print("Password Match:", result)
+
+    if not result:
         raise HTTPException(
             status_code=401,
             detail="Invalid username or password"

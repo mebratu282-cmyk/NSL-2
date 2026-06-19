@@ -11,3 +11,16 @@ def require_admin(current_user=Depends(get_current_user)):
             detail="Admin access required"
         )
     return current_user
+def require_supervisor(
+    current_user=Depends(get_current_user)
+):
+    if current_user.role not in [
+        "SUPERVISOR",
+        "ADMIN"
+    ]:
+        raise HTTPException(
+            status_code=403,
+            detail="Supervisor access required"
+        )
+
+    return current_user

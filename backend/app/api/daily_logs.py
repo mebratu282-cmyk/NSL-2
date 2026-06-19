@@ -6,7 +6,7 @@ from app.database.connection import get_db
 from app.models.daily_log import DailyLog
 from app.schemas.daily_log import DailyLogCreate
 from app.schemas.approval import ApprovalRequest
-from app.core.roles import require_admin
+from app.core.roles import require_admin,require_supervisor
 from app.models.user import User
 
 from app.models.service import Service
@@ -53,7 +53,7 @@ def approve_log(
     log_id: int,
     request: ApprovalRequest,
     db: Session = Depends(get_db),
-    current_user=Depends(require_admin)
+    current_user=Depends(require_supervisor)
 ):
 
     log = (
@@ -70,7 +70,7 @@ def approve_log(
             detail="Log not found"
         )
 
-        log.status = "APPROVED"
+    log.status = "APPROVED"
 
     log.approved_by = current_user.user_id
 
@@ -87,7 +87,7 @@ def reject_log(
     log_id: int,
     request: ApprovalRequest,
     db: Session = Depends(get_db),
-    current_user=Depends(require_admin)
+    current_user=Depends(require_supervisor)
 ):
 
     log = (
@@ -104,7 +104,7 @@ def reject_log(
             detail="Log not found"
         )
 
-        log.status = "REJECTED"
+    log.status = "REJECTED"
 
     log.approved_by = current_user.user_id
 
