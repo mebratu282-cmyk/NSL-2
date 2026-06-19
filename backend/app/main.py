@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from app.api.users import router as users_router
 from app.database.base import Base
+from app.api.performance import router as performance_router
 from app.database.connection import engine
 from app.api.auth import router as auth_router
 from fastapi.middleware.cors import CORSMiddleware
@@ -58,6 +59,7 @@ from app.api.daily_log_activities import (
     router as daily_log_activities_router
 )
 
+
 app = FastAPI(
     title="NSL Government Service System",
     version="1.0.0"
@@ -80,8 +82,9 @@ app.include_router(
 app.include_router(
 analytics.router
 )
-
-app.include_router(performance_router)
+app.include_router(
+    performance_router
+)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
