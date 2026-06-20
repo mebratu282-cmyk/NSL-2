@@ -11,6 +11,10 @@ from app.models.employee import Employee
 from app.models.daily_log import DailyLog
 from app.api.departments import router as departments_router
 from app.models.approval import Approval
+from app.api.audit import router as audit_router
+from app.api.audit_logs import (
+    router as audit_logs_router
+)
 from app.api.service_categories import (
     router as service_categories_router
 )
@@ -77,6 +81,9 @@ app.include_router(daily_log_activities_router)
 app.include_router(log_activities_router)
 app.include_router(reports_router)
 app.include_router(
+    audit_logs_router
+)
+app.include_router(
     log_activities_router
 )
 app.include_router(
@@ -84,6 +91,9 @@ analytics.router
 )
 app.include_router(
     performance_router
+)
+app.include_router(
+    audit_router
 )
 app.add_middleware(
     CORSMiddleware,

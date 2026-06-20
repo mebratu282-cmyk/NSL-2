@@ -8,7 +8,10 @@ from app.schemas.daily_log import DailyLogCreate
 from app.schemas.approval import ApprovalRequest
 from app.core.roles import require_admin,require_supervisor
 from app.models.user import User
-
+from app.services.audit_service import create_audit_log
+from app.services.audit_service import (
+    create_audit_log
+)
 from app.models.service import Service
 from app.schemas.supervisor import (
     PendingLogResponse
@@ -77,10 +80,15 @@ def approve_log(
     log.approval_comment = request.approval_comment
 
     db.commit()
-
     return {
         "message": "Log approved"
     }
+    create_audit_log(
+        db=db,
+        user_id=current_user.user_id,
+        action_type="APPROVE_LOG",
+        details=f"Approved Daily Log #{log_id}"
+    )
 
 @router.put("/{log_id}/reject")
 def reject_log(
@@ -111,10 +119,18 @@ def reject_log(
     log.approval_comment = request.approval_comment
 
     db.commit()
-
+    
+   
     return {
         "message": "Log rejected"
     }
+    create_audit_log(
+        db=db,
+        user_id=current_user.user_id,
+        action_type="REJECT_LOG",
+        details=f"Rejected Daily Log #{log_id}"
+    )
+
 
 @router.put("/{log_id}/submit")
 def submit_log(
@@ -136,13 +152,21 @@ def submit_log(
             detail="Log not found"
         )
 
-        log.status = "SUBMITTED"
-
+    log.status = "SUBMITTED"
+    
     db.commit()
-
+    
+        
     return {
         "message": "Log submitted"
     }
+    create_audit_log(
+        db=db,
+        user_id=log.user_id,
+        action_type="SUBMIT_LOG",
+        details=f"Submitted Daily Log #{log_id}"
+        ) 
+    
 @router.get("/pending/{supervisor_id}")
 def get_pending_logs(
     supervisor_id: int,

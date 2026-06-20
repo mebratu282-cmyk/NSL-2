@@ -13,6 +13,9 @@ from app.schemas.employee import (
 EmployeeCreate,
 EmployeeUpdate
 )
+from app.services.audit_service import (
+    create_audit_log
+)
 
 from app.core.roles import require_admin
 
@@ -78,15 +81,23 @@ def create_employee(
             employee.department_id
     )
 
-    db.add(db_employee)
+   
+    
+   
+    
+    db.add(employee)
 
     db.commit()
 
-    db.refresh(db_employee)
-
+    db.refresh(employee)
     return db_employee
 
-
+    create_audit_log(
+        db=db,
+        user_id=current_user.user_id,
+        action_type="CREATE_EMPLOYEE",
+        details=f"Created Employee {employee.employee_code}"
+    )
 @router.get("/")
 def get_employees(
     db: Session = Depends(get_db)

@@ -7,6 +7,9 @@ from app.database.connection import get_db
 from app.models.user import User
 from app.schemas.auth import LoginRequest
 from app.core.dependencies import get_current_user
+from app.services.audit_service import (
+    create_audit_log
+)
 from fastapi.security import OAuth2PasswordRequestForm 
 from app.core.security import (
     verify_password,
@@ -57,7 +60,7 @@ def login(
     result = verify_password(
         form_data.password,
         str(user.password_hash)
-    )
+        )
 
     print("Password Match:", result)
 
@@ -65,6 +68,13 @@ def login(
         raise HTTPException(
             status_code=401,
             detail="Invalid username or password"
+        )
+
+        create_audit_log(
+            db=db,
+            user_id=user.user_id,
+            action_type="LOGIN",
+            details=f"{user.employee_code} logged in"
         )
 
     token = create_access_token(

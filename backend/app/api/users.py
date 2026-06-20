@@ -4,7 +4,9 @@ from fastapi import Depends
 from sqlalchemy.orm import Session
 
 from app.database.connection import get_db
-
+from app.services.audit_service import (
+    create_audit_log
+)
 from app.models.user import User
 from app.core.roles import require_admin
 
@@ -120,7 +122,13 @@ def change_password(
     )
 
     db.commit()
-
+   
     return {
         "message": "Password updated"
     }
+    create_audit_log(
+        db=db,
+        user_id=current_user.user_id,
+        action_type="CHANGE_PASSWORD",
+        details="User changed password"
+    )

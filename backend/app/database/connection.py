@@ -1,6 +1,8 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+from app.database.base import Base
+
 DB_USER = "system"
 DB_PASSWORD = "p1rphwgbm"
 DB_HOST = "localhost"

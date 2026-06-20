@@ -5,7 +5,7 @@ from sqlalchemy import DateTime
 
 from datetime import datetime
 
-from app.database.base import Base
+from app.database.connection import Base
 
 
 class AuditLog(Base):
