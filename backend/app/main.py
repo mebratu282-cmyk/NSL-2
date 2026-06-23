@@ -12,6 +12,7 @@ from app.models.daily_log import DailyLog
 from app.api.departments import router as departments_router
 from app.models.approval import Approval
 from app.api.audit import router as audit_router
+from app.api.kpis import router as kpis_router
 from app.api.audit_logs import (
     router as audit_logs_router
 )
@@ -91,6 +92,7 @@ app.include_router(daily_log_activities_router)
 app.include_router(log_activities_router)
 app.include_router(reports_router)
 app.include_router(team_router)
+app.include_router(kpis_router)
 app.include_router(
     audit_logs_router
 )
