@@ -22,6 +22,10 @@ from app.core.security import (
 from app.schemas.change_password import (
     ChangePasswordRequest
 )
+from app.schemas.user import(
+    SupervisorAssignment
+)
+
 router = APIRouter(
     prefix="/users",
     tags=["Users"]
@@ -132,3 +136,72 @@ def change_password(
         action_type="CHANGE_PASSWORD",
         details="User changed password"
     )
+    
+@router.put("/{user_id}/assign-supervisor")
+def assign_supervisor(
+    user_id: int,
+    assignment: SupervisorAssignment,
+    db: Session = Depends(get_db),
+    current_user=Depends(require_admin)
+):
+    print("USER ID:", user_id)
+    print("SUPERVISOR ID:", assignment.supervisor_id)
+
+    user = (
+        db.query(User)
+        .filter(User.user_id == user_id)
+        .first()
+    )
+
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found"
+        )
+
+    supervisor = (
+        db.query(User)
+        .filter(
+            User.user_id == assignment.supervisor_id
+        )
+        .first()
+    )
+
+    if not supervisor:
+        raise HTTPException(
+            status_code=404,
+            detail="Supervisor not found"
+        )
+
+    if supervisor.role != "SUPERVISOR":
+        raise HTTPException(
+            status_code=400,
+            detail="Selected user is not a supervisor"
+        )
+
+    user.supervisor_id = assignment.supervisor_id
+
+    db.commit()
+
+    create_audit_log(
+        db=db,
+        user_id=current_user.user_id,
+        action_type="ASSIGN_SUPERVISOR",
+        details=f"Assigned {user.employee_code} to {supervisor.employee_code}"
+    )
+
+    return {
+        "message": "Supervisor assigned"
+    }  
+@router.get("/test-supervisor/{user_id}")
+def test_supervisor(
+    user_id: int,
+    db: Session = Depends(get_db)
+):
+    user = (
+        db.query(User)
+        .filter(User.user_id == user_id)
+        .first()
+    )
+
+    return user

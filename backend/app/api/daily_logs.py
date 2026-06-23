@@ -12,6 +12,9 @@ from app.services.audit_service import create_audit_log
 from app.services.audit_service import (
     create_audit_log
 )
+from app.services.notification_service import (
+    create_notification
+    )
 from app.models.service import Service
 from app.schemas.supervisor import (
     PendingLogResponse
@@ -80,15 +83,23 @@ def approve_log(
     log.approval_comment = request.approval_comment
 
     db.commit()
-    return {
-        "message": "Log approved"
-    }
+    create_notification(
+        db=db,
+        user_id=log.user_id,
+        title="Log Approved",
+        message=f"Daily Log #{log_id} was approved"
+        )
     create_audit_log(
         db=db,
         user_id=current_user.user_id,
         action_type="APPROVE_LOG",
         details=f"Approved Daily Log #{log_id}"
     )
+    return {
+        "message": "Log approved"
+    }
+    
+    
 
 @router.put("/{log_id}/reject")
 def reject_log(
@@ -119,17 +130,22 @@ def reject_log(
     log.approval_comment = request.approval_comment
 
     db.commit()
-    
-   
-    return {
-        "message": "Log rejected"
-    }
     create_audit_log(
         db=db,
         user_id=current_user.user_id,
         action_type="REJECT_LOG",
         details=f"Rejected Daily Log #{log_id}"
     )
+    create_notification(
+        db=db,
+        user_id=log.user_id,
+        title="Log Rejected",
+        message=f"Daily Log #{log_id} was rejected"
+    )
+    return {
+        "message": "Log rejected"
+    }
+    
 
 
 @router.put("/{log_id}/submit")
@@ -153,19 +169,37 @@ def submit_log(
         )
 
     log.status = "SUBMITTED"
-    
+
     db.commit()
-    
-        
-    return {
-        "message": "Log submitted"
-    }
+
+    employee = (
+        db.query(User)
+        .filter(
+            User.user_id == log.user_id
+        )
+        .first()
+    )
+
+    if employee and employee.supervisor_id:
+
+        create_notification(
+            db=db,
+            user_id=employee.supervisor_id,
+            title="New Submission",
+            message=f"Daily Log #{log_id} awaiting review"
+        )
+
     create_audit_log(
         db=db,
         user_id=log.user_id,
         action_type="SUBMIT_LOG",
         details=f"Submitted Daily Log #{log_id}"
-        ) 
+    )
+
+    return {
+        "message": "Log submitted"
+    }
+ 
     
 @router.get("/pending/{supervisor_id}")
 def get_pending_logs(

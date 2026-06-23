@@ -10,25 +10,20 @@ from app.database.connection import Base
 
 class AuditLog(Base):
 
-    __tablename__ = "audit_logs"
+    __tablename__ = "AUDIT_LOGS"
 
     audit_id = Column(
         Integer,
-        primary_key=True,
-        index=True
+        primary_key=True
     )
 
     user_id = Column(Integer)
 
-    action = Column(
-        String(200)
-    )
+    action_type = Column(String(100))
 
-    details = Column(
-        String(500)
-    )
+    details = Column(String(2000))
 
-    created_at = Column(
+    action_date = Column(
         DateTime,
         default=datetime.utcnow
     )

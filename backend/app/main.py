@@ -52,18 +52,28 @@ from app.api.reports import (
 )
 from app.models.service_category import ServiceCategory
 from app.models.service import Service
+from app.api.leaves import router as leaves_router
 from app.api.activity_template import (
     router as activity_template_router
 )
 from app.models.daily_log_activity import (
     DailyLogActivity
 )
-
+from app.api.team import (
+    router as team_router
+)
 from app.api.daily_log_activities import (
     router as daily_log_activities_router
 )
-
-
+from app.api.audit_logs import (
+    router as audit_logs_router
+)
+from app.api.notifications import (
+    router as notifications_router
+)
+from app.api.tasks import (
+    router as tasks_router
+)
 app = FastAPI(
     title="NSL Government Service System",
     version="1.0.0"
@@ -80,8 +90,12 @@ app.include_router(activity_template_router)
 app.include_router(daily_log_activities_router)
 app.include_router(log_activities_router)
 app.include_router(reports_router)
+app.include_router(team_router)
 app.include_router(
     audit_logs_router
+)
+app.include_router(
+    tasks_router
 )
 app.include_router(
     log_activities_router
@@ -95,6 +109,10 @@ app.include_router(
 app.include_router(
     audit_router
 )
+app.include_router(
+    notifications_router
+)
+app.include_router(leaves_router)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[

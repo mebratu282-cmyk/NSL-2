@@ -1,6 +1,11 @@
 from pydantic import BaseModel
 
 
+class SupervisorAssignment(
+    BaseModel
+):
+    supervisor_id: int
+
 class UserCreate(BaseModel):
     username: str
     full_name: str

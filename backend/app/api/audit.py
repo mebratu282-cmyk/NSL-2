@@ -20,7 +20,7 @@ def get_audit_logs(
     logs = (
         db.query(AuditLog)
         .order_by(
-            AuditLog.created_at.desc()
+            AuditLog.action_date.desc()
         )
         .all()
     )

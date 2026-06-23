@@ -6,16 +6,14 @@ from app.models.audit_log import AuditLog
 def create_audit_log(
     db: Session,
     user_id: int,
-    action: str,
+    action_type: str,
     details: str
 ):
-
-    audit = AuditLog(
+    log = AuditLog(
         user_id=user_id,
-        action=action,
+        action_type=action_type,
         details=details
     )
 
-    db.add(audit)
-
+    db.add(log)
     db.commit()
